@@ -6,6 +6,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import ru.job4j.cars.model.User;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,8 +29,9 @@ public class UserRepository {
             session.getTransaction().commit();
         } catch (Exception e) {
             session.getTransaction().rollback();
+        } finally {
+            session.close();
         }
-        session.close();
         return user;
     }
 
@@ -46,8 +48,9 @@ public class UserRepository {
             session.getTransaction().commit();
         } catch (Exception e) {
             session.getTransaction().rollback();
+        } finally {
+            session.close();
         }
-        session.close();
     }
 
     /**
@@ -65,8 +68,9 @@ public class UserRepository {
                     .executeUpdate();
         } catch (Exception e) {
             session.getTransaction().rollback();
+        } finally {
+            session.close();
         }
-        session.close();
     }
 
     /**
@@ -76,8 +80,15 @@ public class UserRepository {
      */
     public List<User> findAllOrderById() {
         Session session = sf.openSession();
-        List<User> result = session.createQuery("FROM User u ORDER BY u.id", User.class).list();
-        session.close();
+        List<User> result = new ArrayList<>();
+        try {
+            session.beginTransaction();
+            result = session.createQuery("FROM User u ORDER BY u.id", User.class).list();
+        } catch (Exception e) {
+            session.getTransaction().rollback();
+        } finally {
+            session.close();
+        }
         return result;
     }
 
@@ -88,9 +99,16 @@ public class UserRepository {
      */
     public Optional<User> findById(int userId) {
         Session session = sf.openSession();
-        User result = session.get(User.class, userId);
-        session.close();
-        return Optional.ofNullable(result);
+        Optional<User> result = Optional.empty();
+        try {
+            session.beginTransaction();
+            result = Optional.of(session.get(User.class, userId));
+        } catch (Exception e) {
+            session.getTransaction().rollback();
+        } finally {
+            session.close();
+        }
+        return result;
     }
 
     /**
@@ -101,9 +119,16 @@ public class UserRepository {
      */
     public List<User> findByLikeLogin(String key) {
         Session session = sf.openSession();
-        Query<User> query = session.createQuery("FROM User u WHERE login LIKE :fKey", User.class);
-        List<User> result = query.setParameter("fKey", "%" + key + "%").list();
-        session.close();
+        List<User> result = new ArrayList<>();
+        try {
+            session.beginTransaction();
+            Query<User> query = session.createQuery("FROM User u WHERE login LIKE :fKey", User.class);
+            result = query.setParameter("fKey", "%" + key + "%").list();
+        } catch (Exception e) {
+            session.getTransaction().rollback();
+        } finally {
+            session.close();
+        }
         return result;
     }
 
@@ -115,10 +140,17 @@ public class UserRepository {
      */
     public Optional<User> findByLogin(String login) {
         Session session = sf.openSession();
-        Query<User> query = session.createQuery(
-                "FROM User u WHERE u.login = :fLogin", User.class);
-        User result = query.setParameter("fLogin", login).getSingleResult();
-        session.close();
-        return Optional.ofNullable(result);
+        Optional<User> result = Optional.empty();
+        try {
+            session.beginTransaction();
+            Query<User> query = session.createQuery(
+                    "FROM User u WHERE u.login = :fLogin", User.class);
+            result = query.setParameter("fLogin", login).uniqueResultOptional();
+        } catch (Exception e) {
+            session.getTransaction().rollback();
+        } finally {
+            session.close();
+        }
+        return result;
     }
 }
