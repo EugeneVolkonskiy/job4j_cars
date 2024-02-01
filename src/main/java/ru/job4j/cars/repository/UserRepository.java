@@ -66,6 +66,7 @@ public class UserRepository {
                             "DELETE User WHERE id = :fId")
                     .setParameter("fId", userId)
                     .executeUpdate();
+            session.getTransaction().commit();
         } catch (Exception e) {
             session.getTransaction().rollback();
         } finally {
@@ -84,6 +85,7 @@ public class UserRepository {
         try {
             session.beginTransaction();
             result = session.createQuery("FROM User u ORDER BY u.id", User.class).list();
+            session.getTransaction().commit();
         } catch (Exception e) {
             session.getTransaction().rollback();
         } finally {
@@ -103,6 +105,7 @@ public class UserRepository {
         try {
             session.beginTransaction();
             result = Optional.of(session.get(User.class, userId));
+            session.getTransaction().commit();
         } catch (Exception e) {
             session.getTransaction().rollback();
         } finally {
@@ -124,6 +127,7 @@ public class UserRepository {
             session.beginTransaction();
             Query<User> query = session.createQuery("FROM User u WHERE login LIKE :fKey", User.class);
             result = query.setParameter("fKey", "%" + key + "%").list();
+            session.getTransaction().commit();
         } catch (Exception e) {
             session.getTransaction().rollback();
         } finally {
@@ -146,6 +150,7 @@ public class UserRepository {
             Query<User> query = session.createQuery(
                     "FROM User u WHERE u.login = :fLogin", User.class);
             result = query.setParameter("fLogin", login).uniqueResultOptional();
+            session.getTransaction().commit();
         } catch (Exception e) {
             session.getTransaction().rollback();
         } finally {
