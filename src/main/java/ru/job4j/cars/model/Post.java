@@ -40,4 +40,8 @@ public class Post {
             inverseJoinColumns = {@JoinColumn(name = "post_id")}
     )
     private List<User> participates = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "post_id")
+    private List<Photo> photos = new ArrayList<>();
 }
