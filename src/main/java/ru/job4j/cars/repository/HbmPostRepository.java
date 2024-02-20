@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 import ru.job4j.cars.model.Post;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Map;
 
@@ -16,14 +18,16 @@ public class HbmPostRepository implements PostRepository {
     @Override
     public Collection<Post> getTodayPosts() {
         return crudRepository.query(
-                "FROM Post WHERE created < now() AND created > current_date", Post.class
+                "FROM Post WHERE created < :fNow AND created > :fCurrentDayStart", Post.class,
+                Map.of("fNow", LocalDateTime.now(),
+                        "fCurrentDayStart", LocalDate.now().atStartOfDay())
         );
     }
 
     @Override
     public Collection<Post> getPostsWithPhoto() {
         return crudRepository.query(
-                "SELECT DISTINCT p FROM Post p JOIN FETCH p.photos WHERE post_id is not null", Post.class
+                "SELECT DISTINCT p FROM Post p JOIN FETCH p.photos WHERE SIZE(p.photos) > 0", Post.class
         );
     }
 
