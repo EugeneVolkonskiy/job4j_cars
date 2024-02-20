@@ -19,7 +19,11 @@ public class History {
     private LocalDateTime startAt;
     private LocalDateTime endAt;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "owner_id")
     private Owner owner;
+
+    @ManyToOne
+    @JoinColumn(name = "car_id")
+    private Car car;
 }

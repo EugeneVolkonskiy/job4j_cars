@@ -6,6 +6,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Data
@@ -20,4 +22,8 @@ public class Owner {
     @EqualsAndHashCode.Include
     private int id;
     private String name;
+
+    @OneToMany
+    @JoinColumn(name = "owner_id")
+    private Set<History> ownerHistories = new HashSet<>();
 }
