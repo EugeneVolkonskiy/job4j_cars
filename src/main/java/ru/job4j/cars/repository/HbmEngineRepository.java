@@ -22,7 +22,7 @@ public class HbmEngineRepository implements EngineRepository {
 
     @Override
     public void update(Engine engine) {
-        crudRepository.run(session -> session.persist(engine));
+        crudRepository.run(session -> session.merge(engine));
     }
 
     @Override
